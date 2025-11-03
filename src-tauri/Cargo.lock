@@ -2309,9 +2309,9 @@ checksum = "a6cb138bb79a146c1bd460005623e142ef0181e3d0219cb493e02f7d08a35695"
 
 [[package]]
 name = "isideload"
-version = "0.1.11"
+version = "0.1.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "035e8d10fbc0cc73a95f2fdd237c4b257abe4470fe6e85ac6132a5b25fa5daca"
+checksum = "cdf83a6c8d2c84df540c998d144d8e4794860ccb77b5ae36de827c91669f4274"
 dependencies = [
  "hex",
  "idevice",

@@ -11,10 +11,11 @@ use crate::{
     device::{get_provider, list_devices, set_selected_device, DeviceInfoMutex},
 };
 use isideload::{sideload::sideload_app, SideloadConfiguration};
-use tauri::{Manager, State};
+use tauri::{AppHandle, Manager, State};
 
 #[tauri::command]
 async fn sideload(
+    handle: AppHandle,
     device_state: State<'_, DeviceInfoMutex>,
     app_path: String,
 ) -> Result<(), String> {
@@ -28,7 +29,14 @@ async fn sideload(
 
     let provider = get_provider(&device).await?;
 
-    let config = SideloadConfiguration::default().set_machine_name("iloader".to_string());
+    let config = SideloadConfiguration::default()
+        .set_machine_name("iloader".to_string())
+        .set_store_dir(
+            handle
+                .path()
+                .app_data_dir()
+                .map_err(|e| format!("Failed to get app data dir: {:?}", e))?,
+        );
 
     let dev_session = get_developer_session().await.map_err(|e| e.to_string())?;
 
