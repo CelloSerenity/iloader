@@ -97,7 +97,7 @@ jobs:
           args: ${{ matrix.args }}
           includeUpdaterJson: ${{ github.event_name == 'release' }}
           releaseId: ${{ github.event_name == 'release' && github.event.release.id || '' }}
-          assetNamePattern: \[name]-[platform]-[arch][ext]
+          assetNamePattern: [name]-[platform]-[arch][ext]
 
       - name: Upload macOS DMG
         uses: actions/upload-artifact@v4
