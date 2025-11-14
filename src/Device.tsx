@@ -13,9 +13,11 @@ export type DeviceInfo = {
 export const Device = ({
   selectedDevice,
   setSelectedDevice,
+  registerRefresh,
 }: {
   selectedDevice: DeviceInfo | null;
   setSelectedDevice: (device: DeviceInfo | null) => void;
+  registerRefresh?: (fn?: () => void) => void;
 }) => {
   const [devices, setDevices] = useState<DeviceInfo[]>([]);
 
@@ -64,25 +66,34 @@ export const Device = ({
     loadDevices();
   }, [loadDevices]);
 
+  useEffect(() => {
+    registerRefresh?.(loadDevices);
+    return () => registerRefresh?.(undefined);
+  }, [registerRefresh, loadDevices]);
+
   return (
     <>
       <h2>iDevice</h2>
       <div className="credentials-container">
         {devices.length === 0 && <div>No devices found.</div>}
-        {devices.map((device) => (
-          <div
-            key={device.id}
-            className={
-              "device-card card" +
-              (selectedDevice?.id === device.id ? " green" : "")
-            }
-          >
-            {device.name} ({device.connectionType})
-            <div className="select-device" onClick={() => selectDevice(device)}>
-              Select
-            </div>
-          </div>
-        ))}
+        {devices.map((device) => {
+          const isActive = selectedDevice?.id === device.id;
+          return (
+            <button
+              key={device.id}
+              className={"device-card card" + (isActive ? " active" : "")}
+              onClick={() => selectDevice(device)}
+            >
+              <div className="device-meta">
+                <span className="device-name">{device.name}</span>
+                <span className="device-connection">
+                  {device.connectionType}
+                </span>
+              </div>
+              {isActive && <span className="device-selected-pill">Selected</span>}
+            </button>
+          );
+        })}
         <button onClick={loadDevices}>Refresh</button>
       </div>
     </>

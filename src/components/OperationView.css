@@ -4,12 +4,26 @@
   gap: 1.25em;
   overflow-y: hidden;
   overflow-x: auto;
+  width: 100%;
 }
 
 .operation-content-container {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.operation-step {
+  display: flex;
+  gap: 0.85rem;
   align-items: center;
+  justify-content: flex-start;
+  padding: 0.75rem 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .operation-step-icon {
@@ -17,24 +31,20 @@
   height: 1.5rem;
   min-width: 1.5rem;
   min-height: 1.5rem;
-  font-size: 1.5rem;
-  padding: 0;
-  margin: 0;
-}
-
-.operation-step {
+  font-size: 1.25rem;
   display: flex;
-  gap: 0.5em;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
 }
 
 .operation-extra-details {
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0.4);
   overflow-x: auto;
-  padding: 0.5em;
-  border-radius: 1px;
-  margin: 0;
+  padding: 0.65em;
+  border-radius: 12px;
+  margin: 0.5rem 0 0;
+  font-family: "SF Mono", "Menlo", monospace;
+  font-size: 0.85rem;
 }
 
 .operation-step-internal {
@@ -50,7 +60,7 @@
   animation: spin 1s linear infinite;
   display: inline-block;
   border-radius: 50%;
-  border-color: var(--foreground) var(--foreground) transparent transparent;
+  border-color: #fff #fff transparent transparent;
   border-style: solid;
   border-width: 3px;
   width: 1.5rem;
@@ -64,13 +74,10 @@
 .waiting-icon {
   display: inline-block;
   border-radius: 50%;
-  border: 3px solid gray;
+  border: 3px solid rgba(255, 255, 255, 0.3);
   width: 1.5rem;
   height: 1.5rem;
   box-sizing: border-box;
-  line-height: 1.5rem;
-  overflow: hidden;
-  background-clip: padding-box;
 }
 
 @keyframes spin {
@@ -83,15 +90,15 @@
 }
 
 .operation-check {
-  color: limegreen;
+  color: var(--success);
 }
 
 .operation-error {
-  color: red;
+  color: var(--danger);
 }
 
 .operation-skipped {
-  color: gray;
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .operation-header {
@@ -100,9 +107,10 @@
 
 .operation-header p {
   margin: 0;
+  color: var(--text-muted);
 }
 
 .operation-success-message {
-  font-weight: bold;
+  font-weight: 600;
   color: rgb(241, 212, 115);
 }
