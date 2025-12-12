@@ -32,10 +32,26 @@ jobs:
             args: ""
           - platform: "macos-latest"
             args: "--target universal-apple-darwin"
+          - platform: "ubuntu-22.04-arm"
+            args: "--bundles deb"
+          - platform: "ubuntu-22.04-arm"
+            args: "--bundles appimage"
 
-    runs-on: ${{ matrix.platform }}
+    runs-on: ${{ matrix.platform == 'ubuntu-22.04-arm' && 'ubuntu-22.04' || matrix.platform }}
+
+    # For arm we need to use the ARM runner and set up qemu
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up ARM runner
+        if: matrix.platform == 'ubuntu-22.04-arm'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-user-static binfmt-support crossbuild-essential-arm64
+          sudo dpkg --add-architecture arm64
+          # Set env for cargo build target
+          echo "CARGO_BUILD_TARGET=aarch64-unknown-linux-gnu" >> $GITHUB_ENV
+          echo "DEB_CROSS=true" >> $GITHUB_ENV
 
       - name: Cache Rust and bun dependencies
         uses: actions/cache@v4
@@ -52,10 +68,10 @@ jobs:
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || matrix.platform == 'ubuntu-22.04-arm' && 'aarch64-unknown-linux-gnu' || '' }}
 
       - name: Install Linux dependencies
-        if: matrix.platform == 'ubuntu-22.04'
+        if: matrix.platform == 'ubuntu-22.04' || matrix.platform == 'ubuntu-22.04-arm'
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf perl make
@@ -102,7 +118,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
-          args: ${{ matrix.args }} ${{ github.event_name != 'release' && ' --config src-tauri/ci.conf.json' || '' }}
+          args: ${{ matrix.args }} ${{ github.event_name != 'release' && ' --config src-tauri/ci.conf.json' || '' }}${{ matrix.platform == 'ubuntu-22.04-arm' && ' --target aarch64-unknown-linux-gnu' || '' }}
           includeUpdaterJson: ${{ github.event_name == 'release' }}
           releaseId: ${{ github.event_name == 'release' && github.event.release.id || '' }}
           assetNamePattern: "[name]-[platform]-[arch][ext]"
@@ -132,9 +148,9 @@ jobs:
 
       - name: Upload Linux DEB
         uses: actions/upload-artifact@v4
-        if: matrix.platform == 'ubuntu-22.04' && matrix.args == '--bundles deb'
+        if: (matrix.platform == 'ubuntu-22.04' || matrix.platform == 'ubuntu-22.04-arm') && matrix.args == '--bundles deb'
         with:
-          name: linux-deb
+          name: ${{ matrix.platform == 'ubuntu-22.04-arm' && 'linux-deb-arm64' || 'linux-deb' }}
           path: ${{ github.workspace }}/src-tauri/target/release/bundle/**/*.deb
 
       - name: Upload Linux RPM
@@ -146,9 +162,9 @@ jobs:
 
       - name: Upload Linux AppImage
         uses: actions/upload-artifact@v4
-        if: matrix.platform == 'ubuntu-22.04' && matrix.args == '--bundles appimage'
+        if: (matrix.platform == 'ubuntu-22.04' || matrix.platform == 'ubuntu-22.04-arm') && matrix.args == '--bundles appimage'
         with:
-          name: linux-appimage
+          name: ${{ matrix.platform == 'ubuntu-22.04-arm' && 'linux-appimage-arm64' || 'linux-appimage' }}
           path: ${{ github.workspace }}/src-tauri/target/release/bundle/**/*.AppImage
 
       - name: Upload Windows EXE
