@@ -27,7 +27,8 @@
 
 * {
   box-sizing: border-box;
-  -webkit-user-select: none;
+  /* TODO: Find solution that doesn't break inputs */
+  /* -webkit-user-select: none; */
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;

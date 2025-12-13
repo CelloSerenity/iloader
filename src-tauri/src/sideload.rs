@@ -40,7 +40,7 @@ pub async fn sideload(
         .map_err(|e| {
             match e {
                 isideload::Error::Certificate(s) if s == "You have too many certificates!" => {
-                    "You have too many certificates. Revoke one by clicking \"Manage Certificates\" and \"Revoke\".".to_string()
+                    "You have too many certificates. Revoke one by clicking \"Certificates\" and \"Revoke\".".to_string()
                 }
                 _ => e.to_string(),
             }
